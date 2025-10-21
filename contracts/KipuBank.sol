@@ -146,8 +146,8 @@ contract KipuBank {
             revert KipuBank__DepositAmountZero();
         }
 
-        uint256 currentBalance = s_balances[msg.sender]; // Single read from storage
-        uint256 newTotalDeposits = address(this).balance; // Total including current deposit
+        uint256 currentBalance = s_balances[msg.sender];
+        uint256 newTotalDeposits = address(this).balance;
 
         if (newTotalDeposits > i_bankCap) {
             revert KipuBank__BankCapExceeded(
@@ -160,16 +160,13 @@ contract KipuBank {
         // EFFECTS
         uint256 newBalance;
         unchecked {
-            // Safe because we know msg.value > 0 and overflow is virtually impossible
             newBalance = currentBalance + msg.value;
             s_depositCount++;
         }
         
-        s_balances[msg.sender] = newBalance; // Single write to storage
+        s_balances[msg.sender] = newBalance;
 
         emit KipuBank__DepositSuccessful(msg.sender, msg.value);
-
-        // INTERACTIONS - None in this function
     }
 
     /**
@@ -181,7 +178,7 @@ contract KipuBank {
      */
     function withdraw(uint256 _amount) external withinThreshold(_amount) {
         // CHECKS
-        uint256 currentBalance = s_balances[msg.sender]; // Single read from storage
+        uint256 currentBalance = s_balances[msg.sender];
 
         if (_amount > currentBalance) {
             revert KipuBank__InsufficientBalance(msg.sender, currentBalance, _amount);
@@ -190,12 +187,11 @@ contract KipuBank {
         // EFFECTS
         uint256 newBalance;
         unchecked {
-            // Safe because we already checked _amount <= currentBalance
             newBalance = currentBalance - _amount;
             s_withdrawalCount++;
         }
 
-        s_balances[msg.sender] = newBalance; // Single write to storage
+        s_balances[msg.sender] = newBalance;
 
         emit KipuBank__WithdrawalSuccessful(msg.sender, _amount);
 
